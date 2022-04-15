@@ -5,7 +5,6 @@ from lists.models import Item
 
 def home_page(request):
     # TODO: support more than one list
-    # TODO: show muliple elements in a table
     if request.method == 'POST':
         Item.objects.create(text=request.POST['item_text'])
         return redirect('/')
