@@ -36,13 +36,21 @@ class NewVisitorTest(unittest.TestCase):
 
         # new element appears on the page
         table = self.browser.find_element_by_id('id_list_table')
-        rows = table.find_element_by_tag_name('tr')
-        self.assertTrue(
-            any(row.text == '1: Buy feathers' for row in rows)
-        )
+        rows = table.find_elements_by_tag_name('tr')
+        self.assertIn('1: Buy feathers', [row.text for row in rows])
 
         # user performs another input
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        inputbox.send_keys('Make a hat from feathers')
+        inputbox.send_keys(Keys.ENTER)
+        time.sleep(1)
+
         # yet another element appears on the page
+        table = self.browser.find_element_by_id('id_list_table')
+        rows = table.find_elements_by_tag_name('tr')
+        self.assertIn('1: Buy feathers', [row.text for row in rows])
+        self.assertIn('2: Make a hat from feathers', [row.text for row in rows])
+
         # a text explaining that a unique URL has been created appears on the page
         # user visits the generated url, the list is in place
 
