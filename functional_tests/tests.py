@@ -7,7 +7,7 @@ from selenium.common.exceptions import WebDriverException
 
 import time
 
-MAX_WAIT = 10
+MAX_WAIT = 3
 
 class NewVisitorTest(LiveServerTestCase):
 
@@ -64,9 +64,7 @@ class NewVisitorTest(LiveServerTestCase):
         self.wait_for_row_in_list_table('2: Make a hat from feathers')
 
         # user visits the generated url, the list is in place
-
-        self.fail('Tests finished!')
-        browser.quit()
+        self.browser.quit()
 
     def test_multiple_users_can_start_lists_at_different_urls(self):
         # Edith works with the website and enters a list item
