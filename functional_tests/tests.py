@@ -30,7 +30,7 @@ class NewVisitorTest(LiveServerTestCase):
                     raise e
                 time.sleep(0.5)
 
-    def test_can_start_a_list_and_retrieve_it_later(self):
+    def test_can_start_a_list_for_one_user(self):
         self.browser.get(self.live_server_url)
 
         # To-Do app homepage exists
@@ -63,9 +63,46 @@ class NewVisitorTest(LiveServerTestCase):
         self.wait_for_row_in_list_table('1: Buy feathers')
         self.wait_for_row_in_list_table('2: Make a hat from feathers')
 
-        # a text explaining that a unique URL has been created appears on the page
         # user visits the generated url, the list is in place
 
         self.fail('Tests finished!')
         browser.quit()
 
+    def test_multiple_users_can_start_lists_at_different_urls(self):
+        # Edith works with the website and enters a list item
+        self.browser.get(self.live_server_url)
+        inputbox = self.browser.find_element(by=By.ID, value='id_new_item')
+        inputbox.send_keys('Buy feathers')
+        inputbox.send_keys(Keys.ENTER)
+        self.wait_for_row_in_list_table('1: Buy feathers')
+
+        # a unique URL has been created for Edith's list
+        edith_list_url = self.browser.current_url
+        self.assertRegex(edith_list_url, '/lists/.+')
+
+        # Francis enters the site
+        ## we start a new browser to remove cookies etc.
+        self.browser.quit()
+        self.browser = webdriver.Firefox()
+
+        # Francis visits the homepage, there are no trails of Edith
+        self.browser.get(self.live_server_url)
+        page_text = self.browser.find_element(by=By.TAG_NAME, value='body').text
+        self.assertNotIn('Buy feathers', page_text)
+        self.assertNotIn('Make a hat', page_text)
+
+        # Francis starts his own list
+        inputbox = self.browser.find_element(by=By.ID, value='id_new_item')
+        inputbox.send_keys('Buy milk')
+        inputbox.send_keys(Keys.ENTER)
+        self.wait_for_row_in_list_table('1: Buy milk')
+
+        # a unique URL has been created for Francis' list
+        francis_list_url = self.browser.current_url
+        self.assertRegex(francis_list_url, '/lists/.+')
+        self.assertNotEqual(francis_list_url, edith_list_url)
+
+        # there are no trails of Edith's list
+        page_text = self.browser.find_element(by=By.TAG_NAME, value='body').text
+        self.assertNotIn('Buy feathers', page_text)
+        self.assertIn('Buy milk', page_text)
