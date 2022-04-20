@@ -30,6 +30,29 @@ class NewVisitorTest(LiveServerTestCase):
                     raise e
                 time.sleep(0.5)
 
+    def test_layout_and_styling(self):
+        # she opens the home page
+        self.browser.get(self.live_server_url)
+        self.browser.set_window_size(1024, 768)
+
+        # everything is neatly centere
+        inputbox = self.browser.find_element(by=By.ID, value='id_new_item')
+        self.assertAlmostEqual(
+            inputbox.location['x'] + inputbox.size['width'] / 2,
+            512,
+            delta = 10
+        )
+        inputbox.send_keys('testing')
+        inputbox.send_keys(Keys.ENTER)
+        self.wait_for_row_in_list_table('1: testing')
+        inputbox = self.browser.find_element(by=By.ID, value='id_new_item')
+        self.assertAlmostEqual(
+            inputbox.location['x'] + inputbox.size['width'] / 2,
+            512,
+            delta = 10
+        )
+
+
     def test_can_start_a_list_for_one_user(self):
         self.browser.get(self.live_server_url)
 
